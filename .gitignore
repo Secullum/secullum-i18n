@@ -1,0 +1,8 @@
+# node
+node_modules
+npm-debug.log
+
+# dotnet
+bin
+obj
+project.lock.json

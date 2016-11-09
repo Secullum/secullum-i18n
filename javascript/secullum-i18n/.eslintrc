@@ -1,0 +1,6 @@
+{
+  "extends": "secullum",
+  "rules": {
+    "no-console": "off"
+  }
+}

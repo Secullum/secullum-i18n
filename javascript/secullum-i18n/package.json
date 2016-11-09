@@ -1,0 +1,31 @@
+{
+  "name": "secullum-i18n",
+  "version": "0.0.1",
+  "description": "Library to add i18n capabilities",
+  "main": "index.js",
+  "repository": {
+    "url": "https://github.com/Secullum/secullum-i18n.git",
+    "type": "git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=6"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "bin": {
+    "secullum-i18n": "./cli.js"
+  },
+  "dependencies": {
+    "mssql": "^3.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.9.1",
+    "eslint-config-secullum": "^1.0.3",
+    "eslint-plugin-flowtype": "2.25.0",
+    "eslint-plugin-import": "2.2.0",
+    "eslint-plugin-jsx-a11y": "3.0.1",
+    "eslint-plugin-react": "6.5.0"
+  }
+}
