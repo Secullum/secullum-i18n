@@ -34,12 +34,21 @@ database.open(config.database)
   })
   .then(recordset => {
     const languages = Object.keys(config.languages);
+    const inserts = [];
 
     for (const language of languages) {
       const expressions = {};
 
       for (let i = 0; i < recordset.length; i++) {
-        expressions[recordset[i].pt] = recordset[i][language];
+        if (recordset[i].found) {
+          expressions[recordset[i].expression] = recordset[i].row[language];
+        } else {
+          if (language === 'pt') {
+            inserts.push(database.insert(recordset[i].expression));
+          }
+          
+          expressions[recordset[i].expression] = recordset[i].expression;
+        }
       }
 
       const outputFilePath = path.join(outputDir, `${language}.json`);
@@ -50,6 +59,8 @@ database.open(config.database)
 
       fs.writeFileSync(outputFilePath, JSON.stringify(outputFileData, null, 2), 'utf8');
     }
+
+    return Promise.all(inserts);
   })
   .catch(err => {
     console.error(err.message);
