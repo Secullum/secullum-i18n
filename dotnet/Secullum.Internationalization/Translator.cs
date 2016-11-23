@@ -32,7 +32,7 @@ namespace Secullum.Internationalization
             }
         }
 
-        public static string Translate(string expression, params string[] args)
+        public static string Translate(string expression, params object[] args)
         {
             var translatedExpresssion = expression;
 
@@ -43,7 +43,7 @@ namespace Secullum.Internationalization
 
             return regexPlaceholder.Replace(translatedExpresssion, match => {
                 var argIndex = int.Parse(match.Groups[1].Value);
-                return args[argIndex];
+                return args[argIndex].ToString();
             });
         }
 
