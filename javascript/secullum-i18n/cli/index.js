@@ -46,7 +46,7 @@ database.open(config.database)
           if (language === 'pt') {
             inserts.push(database.insert(recordset[i].expression));
           }
-          
+
           expressions[recordset[i].expression] = recordset[i].expression;
         }
       }

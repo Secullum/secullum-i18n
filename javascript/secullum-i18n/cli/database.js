@@ -14,11 +14,12 @@ const fetch = portugues => {
     .query(query)
     .then(recordset => {
       const found = recordset.length > 0;
+
       return {
-        found: found,
+        found,
         row: found ? recordset[0] : null,
         expression: portugues
-      }
+      };
     });
 };
 
