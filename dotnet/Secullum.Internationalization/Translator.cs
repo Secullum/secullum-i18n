@@ -35,10 +35,11 @@ namespace Secullum.Internationalization
         public static string Translate(string expression, params object[] args)
         {
             var translatedExpresssion = expression;
+            var expressions = expressionsByLanguage[GetCurrentLanguageKey()];
 
-            if (expressionsByLanguage[GetCurrentLanguageKey()].ContainsKey(expression))
+            if (expressions.ContainsKey(expression) && expressions[expression] != string.Empty)
             {
-                translatedExpresssion = expressionsByLanguage[GetCurrentLanguageKey()][expression];
+                translatedExpresssion = expressions[expression];
             }
 
             return regexPlaceholder.Replace(translatedExpresssion, match => {
