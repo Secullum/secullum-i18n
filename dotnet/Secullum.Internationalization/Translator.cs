@@ -15,9 +15,9 @@ namespace Secullum.Internationalization
         private static Dictionary<string, string> dateFormatsByLanguage = new Dictionary<string, string>();
         private static Regex regexPlaceholder = new Regex(@"\{(\d)\}", RegexOptions.Compiled);
 
-        public static void AddResource(string language, string resourceName)
+        public static void AddResource(string language, string resourceName, Assembly assembly)
         {
-            using (var resourceStream = Assembly.GetEntryAssembly().GetManifestResourceStream(resourceName))
+            using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
             using (var streamReader = new StreamReader(resourceStream, Encoding.UTF8))
             {
                 var resourceContent = JsonConvert.DeserializeObject<JObject>(streamReader.ReadToEnd());
@@ -30,6 +30,11 @@ namespace Secullum.Internationalization
                     expressionsByLanguage[language].Add(expression.Name, expression.Value.ToString());
                 }
             }
+        }
+
+        public static void AddResource(string language, string resourceName)
+        {
+            AddResource(language, resourceName, Assembly.GetEntryAssembly());
         }
 
         public static string Translate(string expression, params object[] args)
