@@ -12,6 +12,7 @@ namespace Secullum.Internationalization
     public class Translator
     {
         private static Dictionary<string, Dictionary<string, string>> expressionsByLanguage = new Dictionary<string, Dictionary<string, string>>();
+        private static Dictionary<string, string> resourceContentByLanguage = new Dictionary<string, string>();
         private static Dictionary<string, string> dateTimeFormatsByLanguage = new Dictionary<string, string>();
         private static Dictionary<string, string> dateFormatsByLanguage = new Dictionary<string, string>();
         private static Dictionary<string, string> timeFormatsByLanguage = new Dictionary<string, string>();
@@ -24,10 +25,11 @@ namespace Secullum.Internationalization
             {
                 var resourceContent = JsonConvert.DeserializeObject<JObject>(streamReader.ReadToEnd());
 
+                expressionsByLanguage[language] = new Dictionary<string, string>();
+                resourceContentByLanguage[language] = resourceContent.ToString(Formatting.None);
                 dateTimeFormatsByLanguage[language] = resourceContent.Value<string>("dateTimeFormat");
                 dateFormatsByLanguage[language] = resourceContent.Value<string>("dateFormat");
                 timeFormatsByLanguage[language] = resourceContent.Value<string>("timeFormat");
-                expressionsByLanguage[language] = new Dictionary<string, string>();
 
                 foreach (JProperty expression in resourceContent["expressions"])
                 {
@@ -70,6 +72,11 @@ namespace Secullum.Internationalization
         public static string GetTimeFormat()
         {
             return timeFormatsByLanguage[GetCurrentLanguageKey()];
+        }
+
+        public static string GetResourceContent()
+        {
+            return resourceContentByLanguage[GetCurrentLanguageKey()];
         }
 
         private static string GetCurrentLanguageKey()
