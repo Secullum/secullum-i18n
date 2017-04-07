@@ -16,9 +16,21 @@ Create a file named sec-i18n.config.json:
     "password": "password"
   },
   "languages": {
-    "pt": { "dateFormat": "dd/MM/yyyy" },
-    "en": { "dateFormat": "MM/dd/yyyy" },
-    "es": { "dateFormat": "dd/MM/yyyy" }
+    "pt": {
+      "dateTimeFormat": "dd/MM/yyyy HH:mm:ss",
+      "dateFormat": "dd/MM/yyyy",
+      "timeFormat": "HH:mm:ss"
+    },
+    "en": {
+      "dateTimeFormat": "MM/dd/yyyy hh:mm:ss tt",
+      "dateFormat": "MM/dd/yyyy",
+      "timeFormat": "hh:mm:ss tt"
+    },
+    "es": {
+      "dateTimeFormat": "dd/MM/yyyy HH:mm:ss",
+      "dateFormat": "dd/MM/yyyy",
+      "timeFormat": "HH:mm:ss"
+    }
   },
   "expressions": [
     "Funcionários",

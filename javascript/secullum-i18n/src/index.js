@@ -1,11 +1,15 @@
 let expressions;
+let dateTimeFormat;
 let dateFormat;
+let timeFormat;
 
 const regexPlaceholders = /\{(\d+)\}/g;
 
 export const init = data => {
   expressions = data.expressions;
+  dateTimeFormat = data.dateTimeFormat;
   dateFormat = data.dateFormat;
+  timeFormat = data.timeFormat;
 };
 
 export const translate = (expression, ...args) => {
@@ -21,6 +25,14 @@ export const translate = (expression, ...args) => {
   });
 };
 
+export const getDateTimeFormat = () => {
+  return dateTimeFormat;
+};
+
 export const getDateFormat = () => {
   return dateFormat;
+};
+
+export const getTimeFormat = () => {
+  return timeFormat;
 };
