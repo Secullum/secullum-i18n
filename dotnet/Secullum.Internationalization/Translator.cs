@@ -46,7 +46,13 @@ namespace Secullum.Internationalization
             foreach (var expression in options.Expressions)
             {
                 caseSensitiveExpressionsByLanguage[language].Add(expression.Key, expression.Value);
-                caseInsensitiveExpressionsByLanguage[language].Add(expression.Key, expression.Value);
+
+                // It may have the same expression with different case (example, "The" and "the").
+                // In these cases, they shouldn't be added again in this dict.
+                if (!caseInsensitiveExpressionsByLanguage.ContainsKey(expression.Key))
+                {
+                    caseInsensitiveExpressionsByLanguage[language].Add(expression.Key, expression.Value);
+                }
             }
         }
 
