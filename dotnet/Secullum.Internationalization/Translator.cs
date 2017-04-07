@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Secullum.Internationalization
 {
@@ -15,39 +15,56 @@ namespace Secullum.Internationalization
         private static Dictionary<string, Dictionary<string, string>> caseSensitiveExpressionsByLanguage = new Dictionary<string, Dictionary<string, string>>();
         private static Dictionary<string, Dictionary<string, string>> caseInsensitiveExpressionsByLanguage = new Dictionary<string, Dictionary<string, string>>();
 
-        private static Dictionary<string, string> resourceContentByLanguage = new Dictionary<string, string>();
+        private static Dictionary<string, LanguageOptions> optionsByLanguage = new Dictionary<string, LanguageOptions>();
+        private static Dictionary<string, string> jsonOptionsByLanguage = new Dictionary<string, string>();
+        private static JsonSerializerSettings jsonSettings = new JsonSerializerSettings();
+
         private static Dictionary<string, string> dateTimeFormatsByLanguage = new Dictionary<string, string>();
         private static Dictionary<string, string> dateFormatsByLanguage = new Dictionary<string, string>();
         private static Dictionary<string, string> timeFormatsByLanguage = new Dictionary<string, string>();
 
         private static Regex regexPlaceholder = new Regex(@"\{(\d)\}", RegexOptions.Compiled);
 
-        public static void AddResource(string language, string resourceName, Assembly assembly)
+        static Translator()
+        {
+            jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            jsonSettings.Formatting = Formatting.None;
+        }
+
+        public static void AddLanguage(string language, LanguageOptions options)
+        {
+            optionsByLanguage[language] = options;
+            jsonOptionsByLanguage[language] = JsonConvert.SerializeObject(options, jsonSettings);
+
+            dateTimeFormatsByLanguage[language] = options.DateTimeFormat;
+            dateFormatsByLanguage[language] = options.DateFormat;
+            timeFormatsByLanguage[language] = options.TimeFormat;
+
+            caseSensitiveExpressionsByLanguage[language] = new Dictionary<string, string>();
+            caseInsensitiveExpressionsByLanguage[language] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var expression in options.Expressions)
+            {
+                caseSensitiveExpressionsByLanguage[language].Add(expression.Key, expression.Value);
+                caseInsensitiveExpressionsByLanguage[language].Add(expression.Key, expression.Value);
+            }
+        }
+
+        public static void AddLanguageFromResource(string language, string resourceName)
+        {
+            AddLanguageFromResource(language, resourceName, Assembly.GetEntryAssembly());
+        }
+
+        public static void AddLanguageFromResource(string language, string resourceName, Assembly assembly)
         {
             using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
             using (var streamReader = new StreamReader(resourceStream, Encoding.UTF8))
             {
-                var resourceContent = JsonConvert.DeserializeObject<JObject>(streamReader.ReadToEnd());
+                var resourceContent = streamReader.ReadToEnd();
+                var languageOptions = JsonConvert.DeserializeObject<LanguageOptions>(resourceContent, jsonSettings);
 
-                resourceContentByLanguage[language] = resourceContent.ToString(Formatting.None);
-                dateTimeFormatsByLanguage[language] = resourceContent.Value<string>("dateTimeFormat");
-                dateFormatsByLanguage[language] = resourceContent.Value<string>("dateFormat");
-                timeFormatsByLanguage[language] = resourceContent.Value<string>("timeFormat");
-
-                caseSensitiveExpressionsByLanguage[language] = new Dictionary<string, string>();
-                caseInsensitiveExpressionsByLanguage[language] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                foreach (JProperty expression in resourceContent["expressions"])
-                {
-                    caseSensitiveExpressionsByLanguage[language].Add(expression.Name, expression.Value.ToString());
-                    caseInsensitiveExpressionsByLanguage[language].Add(expression.Name, expression.Value.ToString());
-                }
+                AddLanguage(language, languageOptions);
             }
-        }
-
-        public static void AddResource(string language, string resourceName)
-        {
-            AddResource(language, resourceName, Assembly.GetEntryAssembly());
         }
 
         public static string Translate(string expression, params object[] args)
@@ -89,9 +106,14 @@ namespace Secullum.Internationalization
             return timeFormatsByLanguage[GetCurrentLanguageKey()];
         }
 
-        public static string GetResourceContent()
+        public static LanguageOptions GetLanguageOptions()
         {
-            return resourceContentByLanguage[GetCurrentLanguageKey()];
+            return optionsByLanguage[GetCurrentLanguageKey()];
+        }
+
+        public static string GetLanguageOptionsAsJson()
+        {
+            return jsonOptionsByLanguage[GetCurrentLanguageKey()];
         }
 
         private static string GetCurrentLanguageKey()
