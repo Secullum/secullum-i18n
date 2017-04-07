@@ -53,8 +53,10 @@ database.open(config.database)
 
       const outputFilePath = path.join(outputDir, `${language}.json`);
       const outputFileData = {
-        expressions,
-        dateFormat: config.languages[language].dateFormat
+        dateTimeFormat: config.languages[language].dateTimeFormat,
+        dateFormat: config.languages[language].dateFormat,
+        timeFormat: config.languages[language].timeFormat,
+        expressions
       };
 
       fs.writeFileSync(outputFilePath, JSON.stringify(outputFileData, null, 2), 'utf8');
