@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -11,11 +12,14 @@ namespace Secullum.Internationalization
 {
     public class Translator
     {
-        private static Dictionary<string, Dictionary<string, string>> expressionsByLanguage = new Dictionary<string, Dictionary<string, string>>();
+        private static Dictionary<string, Dictionary<string, string>> caseSensitiveExpressionsByLanguage = new Dictionary<string, Dictionary<string, string>>();
+        private static Dictionary<string, Dictionary<string, string>> caseInsensitiveExpressionsByLanguage = new Dictionary<string, Dictionary<string, string>>();
+
         private static Dictionary<string, string> resourceContentByLanguage = new Dictionary<string, string>();
         private static Dictionary<string, string> dateTimeFormatsByLanguage = new Dictionary<string, string>();
         private static Dictionary<string, string> dateFormatsByLanguage = new Dictionary<string, string>();
         private static Dictionary<string, string> timeFormatsByLanguage = new Dictionary<string, string>();
+
         private static Regex regexPlaceholder = new Regex(@"\{(\d)\}", RegexOptions.Compiled);
 
         public static void AddResource(string language, string resourceName, Assembly assembly)
@@ -25,15 +29,18 @@ namespace Secullum.Internationalization
             {
                 var resourceContent = JsonConvert.DeserializeObject<JObject>(streamReader.ReadToEnd());
 
-                expressionsByLanguage[language] = new Dictionary<string, string>();
                 resourceContentByLanguage[language] = resourceContent.ToString(Formatting.None);
                 dateTimeFormatsByLanguage[language] = resourceContent.Value<string>("dateTimeFormat");
                 dateFormatsByLanguage[language] = resourceContent.Value<string>("dateFormat");
                 timeFormatsByLanguage[language] = resourceContent.Value<string>("timeFormat");
 
+                caseSensitiveExpressionsByLanguage[language] = new Dictionary<string, string>();
+                caseInsensitiveExpressionsByLanguage[language] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
                 foreach (JProperty expression in resourceContent["expressions"])
                 {
-                    expressionsByLanguage[language].Add(expression.Name, expression.Value.ToString());
+                    caseSensitiveExpressionsByLanguage[language].Add(expression.Name, expression.Value.ToString());
+                    caseInsensitiveExpressionsByLanguage[language].Add(expression.Name, expression.Value.ToString());
                 }
             }
         }
@@ -45,8 +52,16 @@ namespace Secullum.Internationalization
 
         public static string Translate(string expression, params object[] args)
         {
+            return Translate(expression, ignoreCase: false, args: args);
+        }
+
+        public static string Translate(string expression, bool ignoreCase, params object[] args)
+        {
+            var expressions = ignoreCase
+                ? caseInsensitiveExpressionsByLanguage[GetCurrentLanguageKey()]
+                : caseSensitiveExpressionsByLanguage[GetCurrentLanguageKey()];
+
             var translatedExpresssion = expression;
-            var expressions = expressionsByLanguage[GetCurrentLanguageKey()];
 
             if (expressions.ContainsKey(expression) && expressions[expression] != string.Empty)
             {
