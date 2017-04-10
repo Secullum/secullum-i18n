@@ -19,10 +19,6 @@ namespace Secullum.Internationalization
         private static Dictionary<string, string> jsonOptionsByLanguage = new Dictionary<string, string>();
         private static JsonSerializerSettings jsonSettings = new JsonSerializerSettings();
 
-        private static Dictionary<string, string> dateTimeFormatsByLanguage = new Dictionary<string, string>();
-        private static Dictionary<string, string> dateFormatsByLanguage = new Dictionary<string, string>();
-        private static Dictionary<string, string> timeFormatsByLanguage = new Dictionary<string, string>();
-
         private static Regex regexPlaceholder = new Regex(@"\{(\d)\}", RegexOptions.Compiled);
 
         static Translator()
@@ -31,31 +27,12 @@ namespace Secullum.Internationalization
             jsonSettings.Formatting = Formatting.None;
         }
 
-        public static void AddLanguage(string language, LanguageOptions options)
+        public static void AddLanguageFromResource(string resourceName)
         {
-            optionsByLanguage[language] = options;
-            jsonOptionsByLanguage[language] = JsonConvert.SerializeObject(options, jsonSettings);
-
-            dateTimeFormatsByLanguage[language] = options.DateTimeFormat;
-            dateFormatsByLanguage[language] = options.DateFormat;
-            timeFormatsByLanguage[language] = options.TimeFormat;
-
-            caseSensitiveExpressionsByLanguage[language] = new Dictionary<string, string>();
-            caseInsensitiveExpressionsByLanguage[language] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var expression in options.Expressions)
-            {
-                caseSensitiveExpressionsByLanguage[language].Add(expression.Key, expression.Value);
-                caseInsensitiveExpressionsByLanguage[language].Add(expression.Key, expression.Value);
-            }
+            AddLanguageFromResource(resourceName, Assembly.GetEntryAssembly());
         }
 
-        public static void AddLanguageFromResource(string language, string resourceName)
-        {
-            AddLanguageFromResource(language, resourceName, Assembly.GetEntryAssembly());
-        }
-
-        public static void AddLanguageFromResource(string language, string resourceName, Assembly assembly)
+        public static void AddLanguageFromResource(string resourceName, Assembly assembly)
         {
             using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
             using (var streamReader = new StreamReader(resourceStream, Encoding.UTF8))
@@ -63,7 +40,22 @@ namespace Secullum.Internationalization
                 var resourceContent = streamReader.ReadToEnd();
                 var languageOptions = JsonConvert.DeserializeObject<LanguageOptions>(resourceContent, jsonSettings);
 
-                AddLanguage(language, languageOptions);
+                AddLanguage(languageOptions);
+            }
+        }
+
+        public static void AddLanguage(LanguageOptions options)
+        {
+            optionsByLanguage[options.Language] = options;
+            jsonOptionsByLanguage[options.Language] = JsonConvert.SerializeObject(options, jsonSettings);
+
+            caseSensitiveExpressionsByLanguage[options.Language] = new Dictionary<string, string>();
+            caseInsensitiveExpressionsByLanguage[options.Language] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var expression in options.Expressions)
+            {
+                caseSensitiveExpressionsByLanguage[options.Language].Add(expression.Key, expression.Value);
+                caseInsensitiveExpressionsByLanguage[options.Language].Add(expression.Key, expression.Value);
             }
         }
 
@@ -93,17 +85,17 @@ namespace Secullum.Internationalization
 
         public static string GetDateTimeFormat()
         {
-            return dateTimeFormatsByLanguage[GetCurrentLanguageKey()];
+            return optionsByLanguage[GetCurrentLanguageKey()].DateTimeFormat;
         }
 
         public static string GetDateFormat()
         {
-            return dateFormatsByLanguage[GetCurrentLanguageKey()];
+            return optionsByLanguage[GetCurrentLanguageKey()].DateFormat;
         }
 
         public static string GetTimeFormat()
         {
-            return timeFormatsByLanguage[GetCurrentLanguageKey()];
+            return optionsByLanguage[GetCurrentLanguageKey()].TimeFormat;
         }
 
         public static LanguageOptions GetLanguageOptions()
