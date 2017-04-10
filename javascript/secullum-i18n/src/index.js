@@ -1,15 +1,17 @@
-let expressions;
+let language;
 let dateTimeFormat;
 let dateFormat;
 let timeFormat;
+let expressions = {};
 
 const regexPlaceholders = /\{(\d+)\}/g;
 
 export const init = data => {
-  expressions = data.expressions;
+  language = data.language;
   dateTimeFormat = data.dateTimeFormat;
   dateFormat = data.dateFormat;
   timeFormat = data.timeFormat;
+  expressions = data.expressions;
 };
 
 export const translate = (expression, ...args) => {
@@ -23,6 +25,10 @@ export const translate = (expression, ...args) => {
     const argIndex = parseInt(number, 10);
     return args[argIndex];
   });
+};
+
+export const getLanguage = () => {
+  return language;
 };
 
 export const getDateTimeFormat = () => {

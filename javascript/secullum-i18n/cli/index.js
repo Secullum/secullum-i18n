@@ -52,7 +52,9 @@ database.open(config.database)
       }
 
       const outputFilePath = path.join(outputDir, `${language}.json`);
+
       const outputFileData = {
+        language,
         dateTimeFormat: config.languages[language].dateTimeFormat,
         dateFormat: config.languages[language].dateFormat,
         timeFormat: config.languages[language].timeFormat,
