@@ -23,7 +23,11 @@ namespace Secullum.Internationalization
 
         static Translator()
         {
-            jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver()
+            {
+                NamingStrategy = new CamelCaseNamingStrategy() { ProcessDictionaryKeys = false }
+            };
+
             jsonSettings.Formatting = Formatting.None;
         }
 
