@@ -76,7 +76,7 @@ namespace Secullum.Internationalization
 
             var translatedExpresssion = expression;
 
-            if (expressions.ContainsKey(expression) && expressions[expression] != string.Empty)
+            if (expressions.ContainsKey(expression) && !string.IsNullOrEmpty(expressions[expression]))
             {
                 translatedExpresssion = expressions[expression];
             }
