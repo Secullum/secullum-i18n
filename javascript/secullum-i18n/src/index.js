@@ -21,6 +21,10 @@ export const translate = (expression, ...args) => {
     translatedExpression = expression;
   }
 
+  if (!translatedExpression) {
+    return '';
+  }
+
   return translatedExpression.replace(regexPlaceholders, (match, number) => {
     const argIndex = parseInt(number, 10);
     return args[argIndex];
