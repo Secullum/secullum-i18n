@@ -1,6 +1,6 @@
 {
   "title": "Secullum.Internationalization",
-  "version": "0.0.14-*",
+  "version": "0.0.15-*",
   "description": "Library to add i18n capabilities",
 
   "packOptions": {
