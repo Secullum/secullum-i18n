@@ -58,6 +58,7 @@ database.open(config.database)
         dateTimeFormat: config.languages[language].dateTimeFormat,
         dateFormat: config.languages[language].dateFormat,
         timeFormat: config.languages[language].timeFormat,
+        dayMonthFormat: config.languages[language].dayMonthFormat,
         expressions
       };
 
