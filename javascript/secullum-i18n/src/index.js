@@ -2,6 +2,7 @@ let language;
 let dateTimeFormat;
 let dateFormat;
 let timeFormat;
+let dayMonthFormat;
 let expressions = {};
 
 const regexPlaceholders = /\{(\d+)\}/g;
@@ -11,6 +12,7 @@ export const init = data => {
   dateTimeFormat = data.dateTimeFormat;
   dateFormat = data.dateFormat;
   timeFormat = data.timeFormat;
+  dayMonthFormat = data.dayMonthFormat;
   expressions = data.expressions;
 };
 
@@ -45,4 +47,8 @@ export const getDateFormat = () => {
 
 export const getTimeFormat = () => {
   return timeFormat;
+};
+
+export const getDayMonthFormat = () => {
+  return dayMonthFormat;
 };

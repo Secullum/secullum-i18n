@@ -102,6 +102,11 @@ namespace Secullum.Internationalization
             return optionsByLanguage[GetCurrentLanguageKey()].TimeFormat;
         }
 
+        public static string GetDayMonthFormat()
+        {
+            return optionsByLanguage[GetCurrentLanguageKey()].DayMonthFormat;
+        }
+
         public static LanguageOptions GetLanguageOptions()
         {
             return optionsByLanguage[GetCurrentLanguageKey()];

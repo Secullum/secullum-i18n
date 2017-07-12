@@ -8,6 +8,7 @@ namespace Secullum.Internationalization
         public string DateTimeFormat { get; set; }
         public string DateFormat { get; set; }
         public string TimeFormat { get; set; }
+        public string DayMonthFormat { get; set; }
         public Dictionary<string, string> Expressions { get; set; }
     }
 }
