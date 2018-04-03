@@ -1,54 +1,59 @@
-let language;
-let dateTimeFormat;
-let dateFormat;
-let timeFormat;
-let dayMonthFormat;
-let expressions = {};
-
 const regexPlaceholders = /\{(\d+)\}/g;
 
+export class Translator {
+  constructor(data) {
+    this.language = data.language;
+    this.dateTimeFormat = data.dateTimeFormat;
+    this.dateFormat = data.dateFormat;
+    this.timeFormat = data.timeFormat;
+    this.dayMonthFormat = data.dayMonthFormat;
+    this.expressions = data.expressions;
+  }
+
+  translate(expression, ...args) {
+    let translatedExpression = this.expressions[expression];
+
+    if (!translatedExpression) {
+      translatedExpression = expression;
+    }
+
+    if (!translatedExpression) {
+      return '';
+    }
+
+    return translatedExpression.replace(regexPlaceholders, (match, number) => {
+      const argIndex = parseInt(number, 10);
+      return args[argIndex];
+    });
+  }
+}
+
+let translator;
+
 export const init = data => {
-  language = data.language;
-  dateTimeFormat = data.dateTimeFormat;
-  dateFormat = data.dateFormat;
-  timeFormat = data.timeFormat;
-  dayMonthFormat = data.dayMonthFormat;
-  expressions = data.expressions;
+  translator = new Translator(data);
 };
 
 export const translate = (expression, ...args) => {
-  let translatedExpression = expressions[expression];
-
-  if (!translatedExpression) {
-    translatedExpression = expression;
-  }
-
-  if (!translatedExpression) {
-    return '';
-  }
-
-  return translatedExpression.replace(regexPlaceholders, (match, number) => {
-    const argIndex = parseInt(number, 10);
-    return args[argIndex];
-  });
+  return translator.translate(expression, ...args);
 };
 
 export const getLanguage = () => {
-  return language;
+  return translator.language;
 };
 
 export const getDateTimeFormat = () => {
-  return dateTimeFormat;
+  return translator.dateTimeFormat;
 };
 
 export const getDateFormat = () => {
-  return dateFormat;
+  return translator.dateFormat;
 };
 
 export const getTimeFormat = () => {
-  return timeFormat;
+  return translator.timeFormat;
 };
 
 export const getDayMonthFormat = () => {
-  return dayMonthFormat;
+  return translator.dayMonthFormat;
 };

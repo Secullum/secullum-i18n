@@ -8,6 +8,17 @@ declare module 'secullum-i18n' {
     expressions: { [key: string]: string };
   }
 
+  export class Translator {
+    language: string;
+    dateTimeFormat: string;
+    dateFormat: string;
+    timeFormat: string;
+    dayMonthFormat: string;
+
+    constructor(data: SecullumI18nData);
+    translate(expression: string, ...args: string[]);
+  }
+
   export const init: (data: SecullumI18nData) => void;
   export const translate: (expression: string, ...args: string[]) => string;
   export const getLanguage: () => string;
