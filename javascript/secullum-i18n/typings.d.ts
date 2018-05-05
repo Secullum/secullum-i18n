@@ -17,12 +17,12 @@ declare module 'secullum-i18n' {
 
     constructor(data: SecullumI18nData);
     translate(expression: string, ...args: string[]);
-    translateFirstUpper(expression: string, firstCharUpperCase: boolean, ...args: string[]);
+    translateFirstUpper(expression: string, ...args: string[]);
   }
 
   export const init: (data: SecullumI18nData) => void;
   export const translate: (expression: string, ...args: string[]) => string;
-  export const translateFirstUpper: (expression: string, firstCharUpperCase: boolean, ...args: string[]) => string;
+  export const translateFirstUpper: (expression: string, ...args: string[]) => string;
   export const getLanguage: () => string;
   export const getDateTimeFormat: () => string;
   export const getDateFormat: () => string;
