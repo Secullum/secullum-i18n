@@ -38,10 +38,10 @@ export const translate = (expression, ...args) => {
   return translator.translate(expression, ...args);
 };
 
-export const translateFirstUpper = (expression, firstCharUpperCase, ...args) => {
+export const translateFirstUpper = (expression, ...args) => {
   const translatedExpression = translator.translate(expression, ...args);
 
-  if (translatedExpression.lenght === 0) {
+  if (translatedExpression.length === 0) {
     return translatedExpression;
   }
 
