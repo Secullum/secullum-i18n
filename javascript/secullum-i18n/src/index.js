@@ -38,7 +38,7 @@ export const translate = (expression, ...args) => {
   return translator.translate(expression, ...args);
 };
 
-export const translate = (expression, firstCharUpperCase, ...args) => {
+export const translateFirstUpper = (expression, firstCharUpperCase, ...args) => {
   const translatedExpression = translator.translate(expression, ...args);
 
   if (translatedExpression.lenght === 0) {
