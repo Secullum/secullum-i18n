@@ -38,6 +38,16 @@ export const translate = (expression, ...args) => {
   return translator.translate(expression, ...args);
 };
 
+export const translate = (expression, firstCharUpperCase, ...args) => {
+  const translatedExpression = translator.translate(expression, ...args);
+
+  if (translatedExpression.lenght === 0) {
+    return translatedExpression;
+  }
+
+  return translatedExpression.substr(0, 1).toUpperCase() + translatedExpression.substr(1).toLowerCase();
+};
+
 export const getLanguage = () => {
   return translator.language;
 };

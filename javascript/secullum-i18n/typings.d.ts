@@ -17,6 +17,7 @@ declare module 'secullum-i18n' {
 
     constructor(data: SecullumI18nData);
     translate(expression: string, ...args: string[]);
+    translate(expression: string, firstCharUpperCase: boolean, ...args: string[]);
   }
 
   export const init: (data: SecullumI18nData) => void;
