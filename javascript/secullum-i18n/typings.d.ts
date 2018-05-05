@@ -22,6 +22,7 @@ declare module 'secullum-i18n' {
 
   export const init: (data: SecullumI18nData) => void;
   export const translate: (expression: string, ...args: string[]) => string;
+  export const translateFirstUpper: (expression: string, firstCharUpperCase: boolean, ...args: string[]) => string;
   export const getLanguage: () => string;
   export const getDateTimeFormat: () => string;
   export const getDateFormat: () => string;
