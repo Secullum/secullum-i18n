@@ -26,6 +26,16 @@ export class Translator {
       return args[argIndex];
     });
   }
+
+  translateFirstUpper(expression, ...args) {
+    const translatedExpression = this.translate(expression, ...args);
+
+    if (translatedExpression.length === 0) {
+      return translatedExpression;
+    }
+
+    return translatedExpression.substr(0, 1).toUpperCase() + translatedExpression.substr(1).toLowerCase();
+  }
 }
 
 let translator;
@@ -39,13 +49,7 @@ export const translate = (expression, ...args) => {
 };
 
 export const translateFirstUpper = (expression, ...args) => {
-  const translatedExpression = translator.translate(expression, ...args);
-
-  if (translatedExpression.length === 0) {
-    return translatedExpression;
-  }
-
-  return translatedExpression.substr(0, 1).toUpperCase() + translatedExpression.substr(1).toLowerCase();
+  return translator.translateFirstUpper(expression, ...args);
 };
 
 export const getLanguage = () => {
