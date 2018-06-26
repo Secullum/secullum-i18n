@@ -1,6 +1,6 @@
 {
   "name": "secullum-i18n",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Library to add i18n capabilities",
   "main": "dist/index.js",
   "repository": {
