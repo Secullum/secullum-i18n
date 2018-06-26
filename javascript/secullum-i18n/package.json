@@ -7,6 +7,11 @@
     "url": "https://github.com/Secullum/secullum-i18n.git",
     "type": "git"
   },
+  "files": [
+    "cli",
+    "dist",
+    "typings.d.ts"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=6"
