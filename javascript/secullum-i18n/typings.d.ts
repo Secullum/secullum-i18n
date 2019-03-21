@@ -5,7 +5,7 @@ declare module 'secullum-i18n' {
     dateFormat: string;
     timeFormat: string;
     dayMonthFormat: string;
-    expressions: { [key: string]: string };
+    expressions: { [key: string]: string | null };
   }
 
   export class Translator {
