@@ -11,12 +11,12 @@ module.exports = function () {
         const node = path.node;
 
         if (
-          node.callee.name === state.opts.translateFunction &&
+          node.callee.name === state.opts.translateFunctionName &&
           node.arguments[0].type === "StringLiteral" &&
           !expressions.includes(node.arguments[0].value)
         ) {
           throw path.buildCodeFrameError(
-            `Untranslated word: ${node.arguments[0].value}`
+            `Expression not found: ${node.arguments[0].value}`
           );
         }
       },

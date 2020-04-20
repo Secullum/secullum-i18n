@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-secullum-i18n",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "babel plugin to check if a word exist in the translate file",
   "main": "index.js",
   "scripts": {
