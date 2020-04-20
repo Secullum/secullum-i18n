@@ -1,0 +1,14 @@
+{
+  "name": "babel-plugin-secullum-i18n",
+  "version": "1.0.0",
+  "description": "babel plugin to check if a word exist in the translate file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "babel-plugin"
+  ],
+  "author": "secullum-softwares",
+  "license": "MIT"
+}
