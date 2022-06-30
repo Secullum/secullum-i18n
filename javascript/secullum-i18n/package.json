@@ -1,6 +1,6 @@
 {
   "name": "secullum-i18n",
-  "version": "0.0.20",
+  "version": "0.1.0",
   "description": "Library to add i18n capabilities",
   "main": "dist/index.js",
   "repository": {
@@ -24,7 +24,7 @@
     "secullum-i18n": "./cli/index.js"
   },
   "dependencies": {
-    "mssql": "^3.3.0"
+    "mssql": "^7.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
