@@ -12,12 +12,12 @@ const fetch = portugues => {
   return new sql.Request()
     .input('portugues', portugues)
     .query(query)
-    .then(recordset => {
-      const found = recordset.length > 0;
+    .then(result => {
+      const found = result.recordset.length > 0;
 
       return {
         found,
-        row: found ? recordset[0] : null,
+        row: found ? result.recordset[0] : null,
         expression: portugues
       };
     });
