@@ -4,6 +4,7 @@ npm-debug.log
 dist
 
 # dotnet
+.vs
 bin
 obj
 project.lock.json

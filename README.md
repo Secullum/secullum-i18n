@@ -9,11 +9,8 @@ Create a file named sec-i18n.config.json:
 ```json
 {
   "outputDir": "<directory to output to>",
-  "database": {
-    "server": "server",
-    "database": "database",
-    "user": "user",
-    "password": "password"
+  "webservice": {
+    "url": "http://localhost:57105/"
   },
   "languages": {
     "pt": {
@@ -41,3 +38,6 @@ Create a file named sec-i18n.config.json:
   ]
 }
 ```
+## Examples
+
+See the examples folder, to view the configuration and return files.

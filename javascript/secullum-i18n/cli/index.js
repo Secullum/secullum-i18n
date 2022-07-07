@@ -2,7 +2,8 @@
 
 const path = require('path');
 const fs = require('fs');
-const database = require('./database');
+const fetch = require('node-fetch')
+
 
 // Read config file
 const cwd = process.cwd();
@@ -25,50 +26,38 @@ if (!directoryExists(outputDir)) {
   fs.mkdirSync(outputDir);
 }
 
-// Fetch expressions from database
-database.open(config.database)
-  .then(() => {
-    return Promise.all(
-      config.expressions.map(exp => database.fetch(exp))
-    );
-  })
-  .then(recordset => {
-    const languages = Object.keys(config.languages);
-    const inserts = [];
+// Fetch expressions from WebService
+let webServiceQuery = async () => {
+  const expressions = {expressions: config.expressions}
 
-    for (const language of languages) {
-      const expressions = {};
+  const response = await fetch(config.webservice.url + "Expressions",{ 
+  method: "POST", 
+  body: JSON.stringify(expressions),
+  headers: {
+    'Content-Type': 'application/json',    
+  }
+}).then(response => response.json());
 
-      for (let i = 0; i < recordset.length; i++) {
-        if (recordset[i].found) {
-          expressions[recordset[i].expression] = recordset[i].row[language];
-        } else {
-          if (language === 'pt') {
-            inserts.push(database.insert(recordset[i].expression));
-          }
+  for(const language in response){
+    const outputFilePath = path.join(outputDir, `${language}.json`);
 
-          expressions[recordset[i].expression] = recordset[i].expression;
-        }
-      }
-
-      const outputFilePath = path.join(outputDir, `${language}.json`);
-
-      const outputFileData = {
-        language,
-        dateTimeFormat: config.languages[language].dateTimeFormat,
-        dateFormat: config.languages[language].dateFormat,
-        timeFormat: config.languages[language].timeFormat,
-        dayMonthFormat: config.languages[language].dayMonthFormat,
-        expressions
-      };
-
-      fs.writeFileSync(outputFilePath, JSON.stringify(outputFileData, null, 2), 'utf8');
+    const outputFileData = {
+      language,
+      dateTimeFormat: config.languages[language].dateTimeFormat,
+      dateFormat: config.languages[language].dateFormat,
+      timeFormat: config.languages[language].timeFormat,
+      dayMonthFormat: config.languages[language].dayMonthFormat,
+      expressions: response[language]
     }
 
-    return Promise.all(inserts);
-  })
-  .catch(err => {
-    console.error(err.message);
-    process.exit(1);
-  })
-  .then(() => database.close());
+    fs.writeFileSync(outputFilePath, JSON.stringify(outputFileData, null, 2), 'utf8');
+  }
+}
+  
+webServiceQuery().catch(err => {
+  console.error(err.message);
+  process.exit(1);
+})
+
+
+
