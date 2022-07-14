@@ -10,7 +10,7 @@ Create a file named sec-i18n.config.json:
 {
   "outputDir": "<directory to output to>",
   "webservice": {
-    "url": "http://localhost:57105/"
+    "url": "http://localhost:5000/"
   },
   "languages": {
     "pt": {
@@ -38,6 +38,3 @@ Create a file named sec-i18n.config.json:
   ]
 }
 ```
-## Examples
-
-See the examples folder, to view the configuration and return files.

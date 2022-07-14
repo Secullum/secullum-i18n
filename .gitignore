@@ -1,10 +1,12 @@
 # node
-node_modules
+dist/
+node_modules/
 npm-debug.log
-dist
 
 # dotnet
-.vs
-bin
-obj
+.vs/
+bin/
+obj/
+deploy/
+*.user
 project.lock.json
