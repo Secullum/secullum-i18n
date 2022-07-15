@@ -49,7 +49,7 @@ namespace Secullum.Internationalization.WebService.Services
                     // Foi necessária uma segunda verificação, pois algumas expressões não estão sendo filtradas por causa do espaço no final.
                     // Fazendo a verificação separada, não penalizamos a maioria dos casos que continuam usando um Dictionary, que tem acesso mais rápido.
                     expressionRecord = expressionsFromDatabase
-                        .Where(x => x.Value.Portuguese.ToUpper().Trim() == expression.Trim())
+                        .Where(x => x.Value.Portuguese.ToUpper().Trim() == expression.ToUpper().Trim())
                         .Select(x => x.Value)
                         .FirstOrDefault();
                 }
