@@ -28,7 +28,7 @@ namespace Secullum.Internationalization.WebService.Services
                     English = x.English,
                     Spanish = x.Spanish
                 })
-                .ToDictionaryAsync(x => x.Portuguese.ToUpper(), x => x);
+                .ToDictionaryAsync(x => x.Portuguese, x => x, StringComparer.OrdinalIgnoreCase);
 
             var portgueseExpressions = new Dictionary<string, string>();
             var englishExpressions = new Dictionary<string, string>();
@@ -38,19 +38,18 @@ namespace Secullum.Internationalization.WebService.Services
 
             foreach (var expression in parameters.Expressions)
             {
-                var searchExpression = expression.ToUpper();
                 ExpressionRecord expressionRecord = null;
 
-                if (expressionsFromDatabase.ContainsKey(searchExpression))
+                if (expressionsFromDatabase.ContainsKey(expression))
                 {
-                    expressionRecord = expressionsFromDatabase[searchExpression];
+                    expressionRecord = expressionsFromDatabase[expression];
                 }
                 else
                 {
                     // Foi necessária uma segunda verificação, pois algumas expressões não estão sendo filtradas por causa do espaço no final.
                     // Fazendo a verificação separada, não penalizamos a maioria dos casos que continuam usando um Dictionary, que tem acesso mais rápido.
                     expressionRecord = expressionsFromDatabase
-                        .Where(x => x.Value.Portuguese.ToUpper().Trim() == searchExpression.Trim())
+                        .Where(x => x.Value.Portuguese.ToUpper().Trim() == expression.Trim())
                         .Select(x => x.Value)
                         .FirstOrDefault();
                 }
