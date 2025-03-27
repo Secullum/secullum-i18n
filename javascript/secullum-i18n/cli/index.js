@@ -27,11 +27,13 @@ if (!directoryExists(outputDir)) {
 
 // Fetch expressions from WebService
 let webServiceQuery = async () => {
-  const expressions = { expressions: config.expressions };
-
+  const bodyData = {
+    Expressions: config.expressions,
+    TranslateDatabase: config.translateDatabase,
+  };
   const response = await fetch(config.webservice.url + "Expressions", {
     method: "POST",
-    body: JSON.stringify(expressions),
+    body: JSON.stringify(bodyData),
     headers: {
       "Content-Type": "application/json",
     },
@@ -47,6 +49,15 @@ let webServiceQuery = async () => {
   const responseData = await response.json();
 
   for (const language in responseData) {
+    
+    if (language === "newExpressions") {
+      if (Object.keys(responseData[language]).length > 0) {
+        console.log("Translated expressions:");
+        console.log(responseData[language]);
+      }
+      continue;
+    }
+
     const outputFilePath = path.join(outputDir, `${language}.json`);
 
     const outputFileData = {
