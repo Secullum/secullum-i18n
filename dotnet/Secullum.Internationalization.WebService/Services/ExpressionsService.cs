@@ -32,17 +32,6 @@ namespace Secullum.Internationalization.WebService.Services
                 })
                 .ToDictionaryAsync(x => x.Portuguese.ToUpper(), x => x, StringComparer.OrdinalIgnoreCase);
 
-            if (parameters.TranslateAllDataBaseExpressions)
-            {
-                var expressionsToTranslate = expressionsFromDatabase
-                    .Where(x => string.IsNullOrWhiteSpace(x.Value.English) || string.IsNullOrWhiteSpace(x.Value.Spanish));
-
-                foreach (var expression in expressionsToTranslate)
-                {
-                    await m_translationService.TranslateExpression(expression.Value);
-                }
-            }
-
             var portgueseExpressions = new Dictionary<string, string>();
             var englishExpressions = new Dictionary<string, string>();
             var spanishExpressions = new Dictionary<string, string>();
@@ -117,7 +106,6 @@ namespace Secullum.Internationalization.WebService.Services
         public class GenerateParameters
         {
             public List<string> Expressions { get; set; }
-            public bool TranslateAllDataBaseExpressions { get; set; }
         }
 
         public class GenerateException : Exception

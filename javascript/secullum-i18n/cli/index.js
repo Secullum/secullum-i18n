@@ -27,13 +27,11 @@ if (!directoryExists(outputDir)) {
 
 // Fetch expressions from WebService
 let webServiceQuery = async () => {
-  const bodyData = {
-    Expressions: config.expressions,
-    TranslateAllDataBaseExpressions: config.translateAllDataBaseExpressions,
-  };
+  const expressions = { expressions: config.expressions };
+
   const response = await fetch(config.webservice.url + "Expressions", {
     method: "POST",
-    body: JSON.stringify(bodyData),
+    body: JSON.stringify(expressions),
     headers: {
       "Content-Type": "application/json",
     },
