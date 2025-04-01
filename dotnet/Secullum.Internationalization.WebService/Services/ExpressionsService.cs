@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Secullum.Internationalization.WebService.Data;
-using Secullum.Internationalization.WebService.Model;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +10,13 @@ namespace Secullum.Internationalization.WebService.Services
 {
     public class ExpressionsService
     {
-        private readonly SecullumInternationalizationWebServiceContext m_secullumInternationalizationWebServiceContext;
-        private readonly TranslationService _translationService = new TranslationService();
+        private readonly SecullumInternationalizationWebServiceContext m_secullumInternationalizationWebServiceContext;        
+        private readonly TranslationService m_translationService;
 
-        public ExpressionsService(SecullumInternationalizationWebServiceContext secullumInternationalizationWebServiceContext)
+        public ExpressionsService(SecullumInternationalizationWebServiceContext seci18nWebServiceContext, IOptions<TranslatorSettings> settings)
         {
-            m_secullumInternationalizationWebServiceContext = secullumInternationalizationWebServiceContext;
+            m_secullumInternationalizationWebServiceContext = seci18nWebServiceContext;
+            m_translationService = new TranslationService(seci18nWebServiceContext, settings);
         }
 
         public async Task<Dictionary<string, Dictionary<string, string>>> GenerateAsync(GenerateParameters parameters)
@@ -30,6 +31,17 @@ namespace Secullum.Internationalization.WebService.Services
                     Spanish = x.Spanish
                 })
                 .ToDictionaryAsync(x => x.Portuguese.ToUpper(), x => x, StringComparer.OrdinalIgnoreCase);
+
+            if (parameters.TranslateAllDataBaseExpressions)
+            {
+                var expressionsToTranslate = expressionsFromDatabase
+                    .Where(x => string.IsNullOrWhiteSpace(x.Value.English) || string.IsNullOrWhiteSpace(x.Value.Spanish));
+
+                foreach (var expression in expressionsToTranslate)
+                {
+                    await m_translationService.TranslateExpression(expression.Value);
+                }
+            }
 
             var portgueseExpressions = new Dictionary<string, string>();
             var englishExpressions = new Dictionary<string, string>();
@@ -58,62 +70,27 @@ namespace Secullum.Internationalization.WebService.Services
 
                 if (expressionRecord != null)
                 {
-                    if (parameters.TranslateDatabase)
-                    {
-                        var update = false;
-
-                        if (string.IsNullOrWhiteSpace(expressionRecord.English))
-                        {
-                            expressionRecord.English = await _translationService.TranslateAsync(expression, "en");
-                            update = true;
-                        }
-
-                        if (string.IsNullOrWhiteSpace(expressionRecord.Spanish))
-                        {
-                            expressionRecord.Spanish = await _translationService.TranslateAsync(expression, "es");
-                            update = true;
-                        }
-
-                        if (update)
-                        {
-                            var existingExpression = await m_secullumInternationalizationWebServiceContext.Expressions
-                                .FirstOrDefaultAsync(e => e.Portuguese == expressionRecord.Portuguese);
-
-                            existingExpression.English = expressionRecord.English;
-                            existingExpression.Spanish = expressionRecord.Spanish;
-                            existingExpression.DateChanged = DateTime.Now;
-
-                            m_secullumInternationalizationWebServiceContext.Expressions.Update(existingExpression);
-
-                            await m_secullumInternationalizationWebServiceContext.SaveChangesAsync();
-                        }
-                    }
-
                     portgueseExpressions.Add(expression, expressionRecord.Portuguese);
                     englishExpressions.Add(expression, expressionRecord.English);
                     spanishExpressions.Add(expression, expressionRecord.Spanish);
                 }
                 else
                 {
-                    var translatedEnglish = await _translationService.TranslateAsync(expression, "en");
-                    var translatedSpanish = await _translationService.TranslateAsync(expression, "es");
-
-                    m_secullumInternationalizationWebServiceContext.Expressions.Add(new Expression()
+                    expressionRecord = new ExpressionRecord
                     {
-                        Portuguese = expression,
-                        English = translatedEnglish,
-                        Spanish = translatedSpanish,
-                        DateCreated = DateTime.Now,
-                    });
+                        Portuguese = expression
+                    };
 
-                    await m_secullumInternationalizationWebServiceContext.SaveChangesAsync();
+                    expressionRecord = await m_translationService.TranslateExpression(expressionRecord);
 
                     portgueseExpressions.Add(expression, expression);
-                    englishExpressions.Add(expression, translatedEnglish);
-                    spanishExpressions.Add(expression, translatedSpanish);
-                    newExpressions.Add($"pt: {expression}", $"en: {translatedEnglish} || es: {translatedSpanish}");
+                    englishExpressions.Add(expression, expressionRecord.English);
+                    spanishExpressions.Add(expression, expressionRecord.Spanish);
+                    newExpressions.Add($"pt: {expression}", $"en: {expressionRecord.English} || es: {expressionRecord.Spanish}");
                 }
             }
+
+            await m_secullumInternationalizationWebServiceContext.SaveChangesAsync();
 
             completeExpressionsDictionary.Add("pt", portgueseExpressions);
             completeExpressionsDictionary.Add("en", englishExpressions);
@@ -140,7 +117,7 @@ namespace Secullum.Internationalization.WebService.Services
         public class GenerateParameters
         {
             public List<string> Expressions { get; set; }
-            public bool TranslateDatabase { get; set; }
+            public bool TranslateAllDataBaseExpressions { get; set; }
         }
 
         public class GenerateException : Exception
@@ -150,7 +127,7 @@ namespace Secullum.Internationalization.WebService.Services
             }
         }
 
-        private class ExpressionRecord
+        public class ExpressionRecord
         {
             public string Portuguese { get; set; }
             public string English { get; set; }

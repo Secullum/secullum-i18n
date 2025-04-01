@@ -29,7 +29,7 @@ if (!directoryExists(outputDir)) {
 let webServiceQuery = async () => {
   const bodyData = {
     Expressions: config.expressions,
-    TranslateDatabase: config.translateDatabase,
+    TranslateAllDataBaseExpressions: config.translateAllDataBaseExpressions,
   };
   const response = await fetch(config.webservice.url + "Expressions", {
     method: "POST",
@@ -49,7 +49,6 @@ let webServiceQuery = async () => {
   const responseData = await response.json();
 
   for (const language in responseData) {
-    
     if (language === "newExpressions") {
       if (Object.keys(responseData[language]).length > 0) {
         console.log("Translated expressions:");

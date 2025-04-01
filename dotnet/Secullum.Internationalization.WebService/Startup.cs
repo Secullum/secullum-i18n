@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Secullum.Internationalization.WebService.Data;
+using Secullum.Internationalization.WebService.Services;
 
 namespace Secullum.Internationalization.WebService
 {
@@ -24,6 +25,8 @@ namespace Secullum.Internationalization.WebService
             services.AddDbContext<SecullumInternationalizationWebServiceContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SecullumInternationalizationWebServiceContext"))
             );
+
+            services.Configure<TranslatorSettings>(Configuration.GetSection("TranslatorSettings"));
 
             services.AddCors();
         }
