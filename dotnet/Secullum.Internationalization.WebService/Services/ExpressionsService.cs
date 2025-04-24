@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Secullum.Internationalization.WebService.Data;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +9,13 @@ namespace Secullum.Internationalization.WebService.Services
 {
     public class ExpressionsService
     {
-        private readonly SecullumInternationalizationWebServiceContext m_secullumInternationalizationWebServiceContext;        
+        private readonly SecullumInternationalizationWebServiceContext m_secullumInternationalizationWebServiceContext;
         private readonly TranslationService m_translationService;
 
-        public ExpressionsService(SecullumInternationalizationWebServiceContext seci18nWebServiceContext, IOptions<TranslatorSettings> settings)
+        public ExpressionsService(SecullumInternationalizationWebServiceContext seci18nWebServiceContext, TranslationService translationService)
         {
             m_secullumInternationalizationWebServiceContext = seci18nWebServiceContext;
-            m_translationService = new TranslationService(seci18nWebServiceContext, settings);
+            m_translationService = translationService;
         }
 
         public async Task<Dictionary<string, Dictionary<string, string>>> GenerateAsync(GenerateParameters parameters)
@@ -87,6 +86,36 @@ namespace Secullum.Internationalization.WebService.Services
             completeExpressionsDictionary.Add("newExpressions", newExpressions);
 
             return completeExpressionsDictionary;
+        }
+
+        public async Task<List<ExpressionRecord>> TranslateAllExpressionsAsync()
+        {
+            var expressionsFromDatabase = await m_secullumInternationalizationWebServiceContext.Expressions
+                .Select(x => new ExpressionRecord
+                {
+                    Portuguese = x.Portuguese,
+                    English = x.English,
+                    Spanish = x.Spanish
+                })
+                .ToDictionaryAsync(x => x.Portuguese.ToUpper(), x => x, StringComparer.OrdinalIgnoreCase);
+
+            var expressionsToTranslate = expressionsFromDatabase
+                .Where(x => string.IsNullOrWhiteSpace(x.Value.English) || string.IsNullOrWhiteSpace(x.Value.Spanish))
+                .Select(x => x.Value)
+                .ToList();
+
+            var translatedExpressions = new List<ExpressionRecord>();
+
+            foreach (var expression in expressionsToTranslate)
+            {
+                await m_translationService.TranslateExpression(expression);
+
+                translatedExpressions.Add(expression);
+            }
+
+            await m_secullumInternationalizationWebServiceContext.SaveChangesAsync();
+
+            return translatedExpressions;
         }
 
         private void CheckRepeatedExpressions(GenerateParameters parameters)

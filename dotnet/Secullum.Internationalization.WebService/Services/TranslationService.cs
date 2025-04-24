@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using Secullum.Internationalization.WebService.Data;
 using Secullum.Internationalization.WebService.Model;
 using static Secullum.Internationalization.WebService.Services.ExpressionsService;
+using Secullum.Internationalization.WebService.HttpClients;
 
 namespace Secullum.Internationalization.WebService.Services
 {
     public class TranslationService
     {
         private readonly SecullumInternationalizationWebServiceContext m_secullumInternationalizationWebServiceContext;
-        private readonly TranslationRequestService m_translationRequestService;
+        private readonly ITranslationHttpClient m_translationRequestService;
 
-        public TranslationService(SecullumInternationalizationWebServiceContext seci18nWebServiceContext, IOptions<TranslatorSettings> settings)
+        public TranslationService(SecullumInternationalizationWebServiceContext seci18nWebServiceContext, ITranslationHttpClient translationHttpClient)
         {
             m_secullumInternationalizationWebServiceContext = seci18nWebServiceContext;
-            m_translationRequestService = new TranslationRequestService(settings);
+            m_translationRequestService = translationHttpClient;
         }
 
         public async Task<ExpressionRecord> TranslateExpression(ExpressionRecord expressionRecord)
