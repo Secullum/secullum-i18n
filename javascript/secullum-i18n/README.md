@@ -1,4 +1,4 @@
-# Como atualizar a versão e usar tags no Git
+# Como atualizar a versão do pacote npm
 
 ## Atualizando a versão do pacote npm
 
@@ -23,27 +23,31 @@
 
 3. Envie as alterações para o repositório remoto:
    ```powershell
-   git push origin main --follow-tags
+   git push origin main
    ```
    > Substitua `main` pelo nome do seu branch principal, se for diferente.
 
 ---
 
-## Usando o git --follow-tags
+## Publicando o pacote no npm
 
-O parâmetro `--follow-tags` faz com que o Git envie automaticamente as tags anotadas criadas localmente junto com o push do branch. Isso é importante para que as tags de versão fiquem disponíveis no repositório remoto (ex: GitHub).
-
-### Exemplo completo:
-```powershell
-npm version minor
-# ou patch/major
-
-git push origin main --follow-tags
-```
+1. Certifique-se de que está logado no npm:
+   ```powershell
+   npm login
+   ```
+2. Execute o build do projeto (se necessário):
+   ```powershell
+   npm run build
+   ```
+3. Publique o pacote:
+   ```powershell
+   npm publish
+   ```
 
 ---
 
 ## Resumo
 - Sempre use `npm version` para atualizar a versão.
-- Use `git push origin main --follow-tags` para enviar branch e tags juntos.
+- Use `git push origin main` para enviar branch e tags juntos.
+- Use `npm publish` para publicar a nova versão no npm.
 - As tags são importantes para releases e integração contínua.
