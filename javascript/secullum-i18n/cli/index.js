@@ -47,6 +47,14 @@ let webServiceQuery = async () => {
   const responseData = await response.json();
 
   for (const language in responseData) {
+    if (language === "newExpressions") {
+      if (Object.keys(responseData[language]).length > 0) {
+        console.log("Translated expressions:");
+        console.log(responseData[language]);
+      }
+      continue;
+    }
+
     const outputFilePath = path.join(outputDir, `${language}.json`);
 
     const outputFileData = {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Secullum.Internationalization.WebService.Data;
 using Secullum.Internationalization.WebService.Services;
 using System.Threading.Tasks;
 
@@ -9,21 +8,32 @@ namespace Secullum.Internationalization.WebService.Controllers
     [Route("/[controller]")]
     public class ExpressionsController : Controller
     {
-        private readonly SecullumInternationalizationWebServiceContext _secullumInternationalizationWebServiceContext;
+        private readonly ExpressionsService _expressionsService;
 
-        public ExpressionsController(SecullumInternationalizationWebServiceContext secullumInternationalizationWebServiceContext)
+        public ExpressionsController(ExpressionsService expressionsService)
         {
-            _secullumInternationalizationWebServiceContext = secullumInternationalizationWebServiceContext;
+            _expressionsService = expressionsService;
         }
 
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] ExpressionsService.GenerateParameters parameters)
         {
-            var service = new ExpressionsService(_secullumInternationalizationWebServiceContext);
-
             try
             {
-                return Json(await service.GenerateAsync(parameters));
+                return Json(await _expressionsService.GenerateAsync(parameters));
+            }
+            catch (ExpressionsService.GenerateException ex)
+            {
+                return BadRequest(new { errorMessage = ex.Message });
+            }
+        }
+
+        [HttpPost("TranslateAll")]
+        public async Task<IActionResult> TranslateAllAsync()
+        {
+            try
+            {
+                return Json(await _expressionsService.TranslateAllExpressionsAsync());
             }
             catch (ExpressionsService.GenerateException ex)
             {

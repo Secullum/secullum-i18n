@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Secullum.Internationalization.WebService.Data;
-using Secullum.Internationalization.WebService.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +10,12 @@ namespace Secullum.Internationalization.WebService.Services
     public class ExpressionsService
     {
         private readonly SecullumInternationalizationWebServiceContext m_secullumInternationalizationWebServiceContext;
+        private readonly TranslationService m_translationService;
 
-        public ExpressionsService(SecullumInternationalizationWebServiceContext secullumInternationalizationWebServiceContext)
+        public ExpressionsService(SecullumInternationalizationWebServiceContext seci18nWebServiceContext, TranslationService translationService)
         {
-            m_secullumInternationalizationWebServiceContext = secullumInternationalizationWebServiceContext;
+            m_secullumInternationalizationWebServiceContext = seci18nWebServiceContext;
+            m_translationService = translationService;
         }
 
         public async Task<Dictionary<string, Dictionary<string, string>>> GenerateAsync(GenerateParameters parameters)
@@ -33,6 +34,7 @@ namespace Secullum.Internationalization.WebService.Services
             var portgueseExpressions = new Dictionary<string, string>();
             var englishExpressions = new Dictionary<string, string>();
             var spanishExpressions = new Dictionary<string, string>();
+            var newExpressions = new Dictionary<string, string>();
 
             var completeExpressionsDictionary = new Dictionary<string, Dictionary<string, string>>();
 
@@ -62,25 +64,58 @@ namespace Secullum.Internationalization.WebService.Services
                 }
                 else
                 {
-                    m_secullumInternationalizationWebServiceContext.Expressions.Add(new Expression()
+                    expressionRecord = new ExpressionRecord
                     {
-                        Portuguese = expression,
-                        DateCreated = DateTime.Now,
-                    });
+                        Portuguese = expression
+                    };
 
-                    await m_secullumInternationalizationWebServiceContext.SaveChangesAsync();
+                    expressionRecord = await m_translationService.TranslateExpression(expressionRecord);
 
                     portgueseExpressions.Add(expression, expression);
-                    englishExpressions.Add(expression, null);
-                    spanishExpressions.Add(expression, null);
+                    englishExpressions.Add(expression, expressionRecord.English);
+                    spanishExpressions.Add(expression, expressionRecord.Spanish);
+                    newExpressions.Add($"pt: {expression}", $"en: {expressionRecord.English} || es: {expressionRecord.Spanish}");
                 }
             }
+
+            await m_secullumInternationalizationWebServiceContext.SaveChangesAsync();
 
             completeExpressionsDictionary.Add("pt", portgueseExpressions);
             completeExpressionsDictionary.Add("en", englishExpressions);
             completeExpressionsDictionary.Add("es", spanishExpressions);
+            completeExpressionsDictionary.Add("newExpressions", newExpressions);
 
             return completeExpressionsDictionary;
+        }
+
+        public async Task<List<ExpressionRecord>> TranslateAllExpressionsAsync()
+        {
+            var expressionsFromDatabase = await m_secullumInternationalizationWebServiceContext.Expressions
+                .Select(x => new ExpressionRecord
+                {
+                    Portuguese = x.Portuguese,
+                    English = x.English,
+                    Spanish = x.Spanish
+                })
+                .ToDictionaryAsync(x => x.Portuguese.ToUpper(), x => x, StringComparer.OrdinalIgnoreCase);
+
+            var expressionsToTranslate = expressionsFromDatabase
+                .Where(x => string.IsNullOrWhiteSpace(x.Value.English) || string.IsNullOrWhiteSpace(x.Value.Spanish))
+                .Select(x => x.Value)
+                .ToList();
+
+            var translatedExpressions = new List<ExpressionRecord>();
+
+            foreach (var expression in expressionsToTranslate)
+            {
+                await m_translationService.TranslateExpression(expression);
+
+                translatedExpressions.Add(expression);
+            }
+
+            await m_secullumInternationalizationWebServiceContext.SaveChangesAsync();
+
+            return translatedExpressions;
         }
 
         private void CheckRepeatedExpressions(GenerateParameters parameters)
@@ -109,7 +144,7 @@ namespace Secullum.Internationalization.WebService.Services
             }
         }
 
-        private class ExpressionRecord
+        public class ExpressionRecord
         {
             public string Portuguese { get; set; }
             public string English { get; set; }
