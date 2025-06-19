@@ -1,3 +1,7 @@
+# Secullum I18n
+
+Biblioteca para adicionar capacidades de internacionalização (i18n) aos seus projetos JavaScript.
+
 # Como atualizar a versão do pacote npm
 
 ## Atualizando a versão do pacote npm

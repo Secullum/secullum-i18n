@@ -18,7 +18,7 @@ namespace Secullum.Internationalization.WebService.Services
             m_translationService = translationService;
         }
 
-        public async Task<Dictionary<string, Dictionary<string, string>>> GenerateAsync(GenerateParameters parameters)
+        public async Task<ExpressionsResponse> GenerateAsync(GenerateParameters parameters)
         {
             CheckRepeatedExpressions(parameters);
 
@@ -35,8 +35,6 @@ namespace Secullum.Internationalization.WebService.Services
             var englishExpressions = new Dictionary<string, string>();
             var spanishExpressions = new Dictionary<string, string>();
             var newExpressions = new Dictionary<string, string>();
-
-            var completeExpressionsDictionary = new Dictionary<string, Dictionary<string, string>>();
 
             foreach (var expression in parameters.Expressions)
             {
@@ -80,12 +78,16 @@ namespace Secullum.Internationalization.WebService.Services
 
             await m_secullumInternationalizationWebServiceContext.SaveChangesAsync();
 
-            completeExpressionsDictionary.Add("pt", portgueseExpressions);
-            completeExpressionsDictionary.Add("en", englishExpressions);
-            completeExpressionsDictionary.Add("es", spanishExpressions);
-            completeExpressionsDictionary.Add("newExpressions", newExpressions);
-
-            return completeExpressionsDictionary;
+            return new ExpressionsResponse
+            {
+                Languages = new Dictionary<string, Dictionary<string, string>>
+                {
+                    { "pt", portgueseExpressions },
+                    { "en", englishExpressions },
+                    { "es", spanishExpressions }
+                },
+                NewExpressions = newExpressions
+            };
         }
 
         public async Task<List<ExpressionRecord>> TranslateAllExpressionsAsync()
@@ -135,6 +137,12 @@ namespace Secullum.Internationalization.WebService.Services
         public class GenerateParameters
         {
             public List<string> Expressions { get; set; }
+        }
+
+        public class ExpressionsResponse
+        {
+            public Dictionary<string, Dictionary<string, string>> Languages { get; set; }
+            public Dictionary<string, string> NewExpressions { get; set; }
         }
 
         public class GenerateException : Exception

@@ -20,7 +20,22 @@ namespace Secullum.Internationalization.WebService.Controllers
         {
             try
             {
-                return Json(await _expressionsService.GenerateAsync(parameters));
+                var result = await _expressionsService.GenerateAsync(parameters);
+                return Json(result.Languages);
+            }
+            catch (ExpressionsService.GenerateException ex)
+            {
+                return BadRequest(new { errorMessage = ex.Message });
+            }
+        }
+
+        [HttpPost("v2")]
+        public async Task<IActionResult> PostWithNewExpressionsAsync([FromBody] ExpressionsService.GenerateParameters parameters)
+        {
+            try
+            {
+                var result = await _expressionsService.GenerateAsync(parameters);
+                return Json(result);
             }
             catch (ExpressionsService.GenerateException ex)
             {

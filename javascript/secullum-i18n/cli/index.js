@@ -29,7 +29,7 @@ if (!directoryExists(outputDir)) {
 let webServiceQuery = async () => {
   const expressions = { expressions: config.expressions };
 
-  const response = await fetch(config.webservice.url + "Expressions", {
+  const response = await fetch(config.webservice.url + "Expressions/v2", {
     method: "POST",
     body: JSON.stringify(expressions),
     headers: {
@@ -46,15 +46,14 @@ let webServiceQuery = async () => {
 
   const responseData = await response.json();
 
-  for (const language in responseData) {
-    if (language === "newExpressions") {
-      if (Object.keys(responseData[language]).length > 0) {
-        console.log("Translated expressions:");
-        console.log(responseData[language]);
-      }
-      continue;
-    }
+  // Show new expressions that were translated
+  if (responseData.newExpressions && Object.keys(responseData.newExpressions).length > 0) {
+    console.log("Translated expressions:");
+    console.log(responseData.newExpressions);
+  }
 
+  // Process and write language files
+  for (const language in responseData.languages) {
     const outputFilePath = path.join(outputDir, `${language}.json`);
 
     const outputFileData = {
@@ -63,7 +62,7 @@ let webServiceQuery = async () => {
       dateFormat: config.languages[language].dateFormat,
       timeFormat: config.languages[language].timeFormat,
       dayMonthFormat: config.languages[language].dayMonthFormat,
-      expressions: responseData[language],
+      expressions: responseData.languages[language]
     };
 
     fs.writeFileSync(
